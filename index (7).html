@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MonCarnet — Gestion scolaire</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B4D3E">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MonCarnet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--vert:#1B4D3E;--vert-cl:#2E7D5B;--or:#D4A017;--fonce:#152A24;--gris:#F4F6F5;--texte:#20263B;--sous:#6B7284;--rouge:#C1272D;--bleu:#1A3FA0;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--gris);color:var(--texte);min-height:100vh}
+h1,h2,.titre{font-family:'Barlow Condensed',sans-serif}
+.ecran{max-width:480px;margin:0 auto;padding:20px 16px 70px}
+.centre{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.boite{background:#fff;border-radius:16px;padding:30px 24px;box-shadow:0 2px 18px rgba(21,42,36,0.1);width:100%;max-width:420px}
+.logo{width:70px;display:block;margin:0 auto 12px}
+h1.titre{font-size:28px;font-weight:700;color:var(--fonce);text-align:center}
+.sous-titre{text-align:center;color:var(--sous);font-size:13.5px;margin-bottom:22px}
+label{display:block;font-size:12px;font-weight:600;color:var(--sous);text-transform:uppercase;letter-spacing:0.4px;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid #E1E3EC;border-radius:8px;font-size:15px;font-family:inherit;background:#fff;color:var(--texte)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--vert)}
+button{cursor:pointer;font-family:inherit;border:0}
+.btn{width:100%;padding:12px;border-radius:8px;font-size:15px;font-weight:600;margin-top:14px}
+.btn-p{background:var(--vert);color:#fff}
+.btn-p:hover{background:var(--vert-cl)}
+.btn-o{background:var(--or);color:#fff}
+.btn-g{background:#fff;border:1.5px solid #E1E3EC;color:var(--texte)}
+.btn-sm{width:auto;padding:7px 13px;font-size:13px;border-radius:6px}
+.erreur{background:#FDECEC;color:var(--rouge);padding:9px 11px;border-radius:7px;font-size:13px;margin-top:10px;display:none}
+.barre{background:var(--fonce);color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.barre b{font-size:14.5px}
+.barre button{background:rgba(255,255,255,0.14);color:#fff;padding:6px 11px;border-radius:6px;font-size:12.5px}
+.onglets{display:flex;background:#fff;border-bottom:1.5px solid #E1E3EC;position:sticky;top:48px;z-index:9;overflow-x:auto}
+.onglet{flex:1;text-align:center;padding:11px 8px;font-size:13px;font-weight:600;color:var(--sous);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent}
+.onglet.actif{color:var(--vert);border-color:var(--vert)}
+.carte{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 8px rgba(21,42,36,0.06)}
+.ligne-carte{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.nom-eleve{font-weight:700;font-size:15.5px;color:var(--fonce)}
+.classe-eleve{font-size:12.5px;color:var(--sous)}
+.badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase}
+.b-vert{background:#DCF0E4;color:var(--vert)}
+.b-rouge{background:#FDECEC;color:var(--rouge)}
+.fab{position:fixed;bottom:22px;right:18px;width:54px;height:54px;border-radius:50%;background:var(--or);color:#fff;font-size:27px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;z-index:20}
+.retour{color:var(--vert);font-size:13.5px;font-weight:600;cursor:pointer;display:inline-block;margin-bottom:14px}
+.section-t{font-size:11.5px;font-weight:700;color:var(--sous);text-transform:uppercase;letter-spacing:0.4px;margin:20px 0 9px;border-bottom:1px solid #EEE;padding-bottom:7px}
+.info-l{display:flex;justify-content:space-between;font-size:13.5px;padding:8px 0;border-bottom:1px solid #F0F1F5}
+.info-l b{color:var(--fonce)}
+.recherche{padding:10px 14px;background:#fff;border-bottom:1px solid #E1E3EC;position:sticky;top:88px;z-index:8}
+.vide{text-align:center;padding:45px 18px;color:var(--sous)}
+.vide div:first-child{font-size:36px;margin-bottom:8px}
+table.notes-t{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+table.notes-t th,table.notes-t td{padding:7px 8px;text-align:left;border-bottom:1px solid #F0F1F5}
+table.notes-t th{color:var(--sous);font-size:11px;text-transform:uppercase}
+.moy-badge{font-weight:700;font-size:22px;color:var(--vert)}
+.paye-barre{height:7px;background:#E1E3EC;border-radius:4px;overflow:hidden;margin-top:5px}
+.paye-remplie{height:100%;background:var(--vert)}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--fonce);color:#fff;padding:11px 18px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:100;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+.x-btn{background:#FDECEC;color:var(--rouge);width:32px;height:32px;border-radius:7px;font-size:15px;flex-shrink:0}
+.gps-ligne{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://lybesaertvgvlvjixwzr.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5YmVzYWVydHZndmx2aml4d3pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mzc0NTcsImV4cCI6MjEwNTIxMzQ1N30.7Xugl-EMlQzztuvLpZyM0ddsFxVVDy1rNoInVGUdq1o';
+const MDP_ADMIN='carnet2026';
+let SESSION_OK=false;
+let ELEVES=[], CONFIG=null;
+let ELEVE_COURANT=null, ONGLET_ACTIF='eleves';
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function genMatricule(){ const a=new Date().getFullYear(); return `EL-${a}-${Math.floor(Math.random()*9000)+1000}`; }
+function fmtDate(iso){ if(!iso) return ''; return new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtFCFA(n){ return (n||0).toLocaleString('fr-FR')+' FCFA'; }
+
+async function sb(path, opts={}){
+  const r=await fetch(`${SB_URL}/rest/v1/${path}`,{...opts, headers:{apikey:SB_KEY, Authorization:`Bearer ${SB_KEY}`, 'Content-Type':'application/json', Prefer: opts.method==='POST'?'return=representation':'', ...(opts.headers||{})}});
+  if(!r.ok){ throw new Error(await r.text()); }
+  const txt=await r.text();
+  return txt? JSON.parse(txt) : null;
+}
+
+function render(html){ document.getElementById('app').innerHTML=html; }
+
+function ecranLogin(){
+  render(`
+  <div class="ecran centre">
+    <div class="boite">
+      <img src="icon-192.png" class="logo">
+      <h1 class="titre">MonCarnet</h1>
+      <div class="sous-titre">Gestion des élèves, notes et paiements</div>
+      <label>Mot de passe</label>
+      <input type="password" id="mdp" placeholder="••••••••">
+      <button class="btn btn-p" onclick="verifMdp()">Se connecter</button>
+      <div class="erreur" id="errLogin"></div>
+    </div>
+  </div>`);
+  document.getElementById('mdp').addEventListener('keydown',e=>{if(e.key==='Enter') verifMdp();});
+  setTimeout(()=>document.getElementById('mdp').focus(),80);
+}
+function verifMdp(){
+  const v=document.getElementById('mdp').value;
+  if(v===MDP_ADMIN){ SESSION_OK=true; demarrerApp(); }
+  else{ const e=document.getElementById('errLogin'); e.textContent='Mot de passe incorrect.'; e.style.display='block'; }
+}
+
+async function demarrerApp(){
+  render(`<div class="ecran centre"><div>⏳ Chargement…</div></div>`);
+  try{
+    const cfgArr=await sb('config?id=eq.principal&select=*');
+    CONFIG = cfgArr && cfgArr[0] ? cfgArr[0] : {nom_ecole:'Mon École', classes:[], matieres:[], frais_scolarite:0};
+    ELEVES = await sb('eleves?select=*&order=nom.asc') || [];
+  }catch(e){ toast('Erreur de connexion : '+e.message); CONFIG={nom_ecole:'Mon École', classes:[], matieres:[], frais_scolarite:0}; ELEVES=[]; }
+  ecranPrincipal();
+}
+
+function ecranPrincipal(){
+  render(`
+    <div class="barre"><b>📒 ${CONFIG.nom_ecole||'MonCarnet'}</b><button onclick="quitter()">Fermer</button></div>
+    <div class="onglets">
+      <div class="onglet ${ONGLET_ACTIF==='eleves'?'actif':''}" onclick="changerOnglet('eleves')">Élèves</div>
+      <div class="onglet ${ONGLET_ACTIF==='paiements'?'actif':''}" onclick="changerOnglet('paiements')">Paiements</div>
+      <div class="onglet ${ONGLET_ACTIF==='parametres'?'actif':''}" onclick="changerOnglet('parametres')">Réglages</div>
+    </div>
+    <div class="recherche"><input id="recherche" placeholder="Rechercher un élève..." oninput="filtrerListe()"></div>
+    <div class="ecran" id="zoneContenu"></div>
+    <div class="fab" onclick="ecranFormEleve()">+</div>
+  `);
+  afficherOnglet();
+}
+function quitter(){ SESSION_OK=false; ELEVE_COURANT=null; ecranLogin(); }
+function changerOnglet(o){ ONGLET_ACTIF=o; ecranPrincipal(); }
+
+function filtrerListe(){
+  const q=document.getElementById('recherche').value.toLowerCase();
+  const filtres = ELEVES.filter(e => (e.nom+' '+e.prenom+' '+e.classe).toLowerCase().includes(q));
+  afficherListeEleves(filtres);
+}
+
+function afficherOnglet(){
+  if(ONGLET_ACTIF==='eleves') afficherListeEleves(ELEVES);
+  else if(ONGLET_ACTIF==='paiements') afficherOngletPaiements();
+  else afficherReglages();
+}
+
+function afficherListeEleves(liste){
+  const zone=document.getElementById('zoneContenu');
+  if(!liste.length){ zone.innerHTML=`<div class="vide"><div>🎓</div>Aucun élève pour l'instant.<br>Cliquez sur + pour en ajouter un.</div>`; return; }
+  zone.innerHTML = liste.map(e=>`
+    <div class="carte">
+      <div class="ligne-carte" onclick="ecranDetailEleve('${e.id}')">
+        <div>
+          <div class="nom-eleve">${e.nom} ${e.prenom}</div>
+          <div class="classe-eleve">${e.classe} · ${e.matricule}</div>
+        </div>
+        <span class="badge ${e.actif?'b-vert':'b-rouge'}">${e.actif?'Actif':'Inactif'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function ecranFormEleve(eleve){
+  const e = eleve || {matricule:genMatricule(), actif:true};
+  const classesOpts = (CONFIG.classes||[]).map(c=>`<option ${e.classe===c?'selected':''}>${c}</option>`).join('');
+  render(`
+    <div class="barre"><b>${eleve?'Modifier élève':'Nouvel élève'}</b><button onclick="ecranPrincipal()">Annuler</button></div>
+    <div class="ecran">
+      <label>Matricule</label>
+      <input id="fMatricule" value="${e.matricule}" ${eleve?'disabled style="background:#F0F1F5"':''}>
+      <label>Nom</label>
+      <input id="fNom" value="${e.nom||''}">
+      <label>Prénom</label>
+      <input id="fPrenom" value="${e.prenom||''}">
+      <label>Classe</label>
+      <select id="fClasse"><option value="">—</option>${classesOpts}</select>
+      <label>Date de naissance</label>
+      <input type="date" id="fNaissance" value="${e.date_naissance||''}">
+      <label>Nom du parent/tuteur</label>
+      <input id="fNomParent" value="${e.nom_parent||''}">
+      <label>Contact du parent</label>
+      <input id="fContact" value="${e.contact_parent||''}" placeholder="07 XX XX XX XX">
+      <label>Statut</label>
+      <select id="fActif"><option value="true" ${e.actif?'selected':''}>Actif</option><option value="false" ${!e.actif?'selected':''}>Inactif</option></select>
+      <button class="btn btn-p" onclick="enregistrerEleve('${eleve?e.id:''}')">💾 Enregistrer</button>
+      ${eleve?`<button class="btn btn-g" style="color:var(--rouge)" onclick="supprimerEleve('${e.id}')">🗑 Supprimer cet élève</button>`:''}
+    </div>
+  `);
+  if(!eleve) setTimeout(()=>document.getElementById('fClasse').value=e.classe||'',50);
+}
+async function enregistrerEleve(id){
+  const payload={
+    matricule:document.getElementById('fMatricule').value.trim(),
+    nom:document.getElementById('fNom').value.trim(),
+    prenom:document.getElementById('fPrenom').value.trim(),
+    classe:document.getElementById('fClasse').value,
+    date_naissance:document.getElementById('fNaissance').value||null,
+    nom_parent:document.getElementById('fNomParent').value.trim(),
+    contact_parent:document.getElementById('fContact').value.trim(),
+    actif:document.getElementById('fActif').value==='true',
+    updated_at:new Date().toISOString()
+  };
+  if(!payload.nom||!payload.prenom){ toast('Nom et prénom obligatoires.'); return; }
+  try{
+    if(id){ await sb(`eleves?id=eq.${id}`,{method:'PATCH', body:JSON.stringify(payload)}); }
+    else{ await sb('eleves',{method:'POST', body:JSON.stringify(payload)}); }
+    toast('Élève enregistré ✓');
+    ELEVES = await sb('eleves?select=*&order=nom.asc') || [];
+    ecranPrincipal();
+  }catch(e){ toast('Erreur : '+e.message); }
+}
+async function supprimerEleve(id){
+  if(!confirm('Supprimer définitivement cet élève (et ses notes/paiements) ?')) return;
+  try{
+    await sb(`eleves?id=eq.${id}`,{method:'DELETE'});
+    toast('Élève supprimé.');
+    ELEVES = await sb('eleves?select=*&order=nom.asc') || [];
+    ecranPrincipal();
+  }catch(e){ toast('Erreur : '+e.message); }
+}
+
+async function ecranDetailEleve(id){
+  const e = ELEVES.find(x=>x.id===id); if(!e) return;
+  ELEVE_COURANT = e;
+  let notes=[], paiements=[];
+  try{
+    notes = await sb(`notes?eleve_id=eq.${id}&select=*&order=date.desc`) || [];
+    paiements = await sb(`paiements?eleve_id=eq.${id}&select=*&order=date.desc`) || [];
+  }catch(err){}
+  const moyenne = notes.length ? (notes.reduce((s,n)=>s+(n.note/n.bareme*20*n.coefficient),0) / notes.reduce((s,n)=>s+n.coefficient,0)).toFixed(2) : '—';
+  const totalPaye = paiements.reduce((s,p)=>s+Number(p.montant),0);
+  const frais = CONFIG.frais_scolarite||0;
+  render(`
+    <div class="barre"><b>${e.nom} ${e.prenom}</b><button onclick="ecranPrincipal()">Retour</button></div>
+    <div class="ecran">
+      <div class="carte">
+        <div class="info-l"><span>Matricule</span><b>${e.matricule}</b></div>
+        <div class="info-l"><span>Classe</span><b>${e.classe||'—'}</b></div>
+        <div class="info-l"><span>Parent</span><b>${e.nom_parent||'—'}</b></div>
+        <div class="info-l"><span>Contact</span><b>${e.contact_parent||'—'}</b></div>
+        <button class="btn btn-g btn-sm" onclick="ecranFormEleve(ELEVE_COURANT)">✏️ Modifier la fiche</button>
+      </div>
+
+      <div class="carte">
+        <div class="section-t" style="margin-top:0">Moyenne générale</div>
+        <div class="moy-badge">${moyenne}/20</div>
+        <div class="section-t">Ajouter une note</div>
+        <select id="nMatiere">${(CONFIG.matieres||[]).map(m=>`<option>${m}</option>`).join('')}</select>
+        <div class="gps-ligne" style="margin-top:8px">
+          <input id="nNote" type="number" step="0.25" placeholder="Note" style="flex:1">
+          <input id="nBareme" type="number" value="20" placeholder="Barème" style="flex:1">
+          <input id="nCoef" type="number" value="1" placeholder="Coef" style="flex:1">
+        </div>
+        <input id="nPeriode" placeholder="Période (ex: Trimestre 1)" style="margin-top:8px">
+        <button class="btn btn-p btn-sm" onclick="ajouterNote('${id}')">+ Ajouter la note</button>
+
+        <div class="section-t">Historique des notes</div>
+        <table class="notes-t">
+          <tr><th>Matière</th><th>Note</th><th>Coef</th><th>Période</th></tr>
+          ${notes.map(n=>`<tr><td>${n.matiere}</td><td>${n.note}/${n.bareme}</td><td>${n.coefficient}</td><td>${n.periode}</td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--sous)">Aucune note.</td></tr>'}
+        </table>
+      </div>
+
+      <div class="carte">
+        <div class="section-t" style="margin-top:0">Scolarité</div>
+        <div class="info-l"><span>Frais annuels</span><b>${fmtFCFA(frais)}</b></div>
+        <div class="info-l"><span>Total payé</span><b>${fmtFCFA(totalPaye)}</b></div>
+        <div class="info-l"><span>Reste à payer</span><b>${fmtFCFA(Math.max(0,frais-totalPaye))}</b></div>
+        <div class="paye-barre"><div class="paye-remplie" style="width:${frais?Math.min(100,totalPaye/frais*100):0}%"></div></div>
+
+        <div class="section-t">Enregistrer un paiement</div>
+        <div class="gps-ligne">
+          <input id="pMontant" type="number" placeholder="Montant FCFA" style="flex:2">
+          <input id="pMode" placeholder="Mode (Espèces...)" style="flex:1">
+        </div>
+        <button class="btn btn-p btn-sm" onclick="ajouterPaiement('${id}')">+ Enregistrer le paiement</button>
+
+        <div class="section-t">Historique des paiements</div>
+        ${paiements.map(p=>`<div class="info-l"><span>${fmtDate(p.date)} — ${p.mode||'—'}</span><b>${fmtFCFA(p.montant)}</b></div>`).join('') || '<div style="color:var(--sous);font-size:13px">Aucun paiement.</div>'}
+      </div>
+    </div>
+  `);
+}
+async function ajouterNote(eleveId){
+  const matiere=document.getElementById('nMatiere').value;
+  const note=parseFloat(document.getElementById('nNote').value);
+  const bareme=parseFloat(document.getElementById('nBareme').value)||20;
+  const coefficient=parseFloat(document.getElementById('nCoef').value)||1;
+  const periode=document.getElementById('nPeriode').value.trim()||'—';
+  if(isNaN(note)){ toast('Entrez une note valide.'); return; }
+  try{
+    await sb('notes',{method:'POST', body:JSON.stringify({eleve_id:eleveId, matiere, note, bareme, coefficient, periode})});
+    toast('Note ajoutée ✓');
+    ecranDetailEleve(eleveId);
+  }catch(e){ toast('Erreur : '+e.message); }
+}
+async function ajouterPaiement(eleveId){
+  const montant=parseFloat(document.getElementById('pMontant').value);
+  const mode=document.getElementById('pMode').value.trim()||'Espèces';
+  if(!montant || montant<=0){ toast('Entrez un montant valide.'); return; }
+  try{
+    await sb('paiements',{method:'POST', body:JSON.stringify({eleve_id:eleveId, montant, mode})});
+    toast('Paiement enregistré ✓');
+    ecranDetailEleve(eleveId);
+  }catch(e){ toast('Erreur : '+e.message); }
+}
+
+async function afficherOngletPaiements(){
+  const zone=document.getElementById('zoneContenu');
+  zone.innerHTML = `<div class="vide"><div>⏳</div>Chargement…</div>`;
+  let tous=[];
+  try{ tous = await sb('paiements?select=*,eleves(nom,prenom,classe)&order=date.desc&limit=100') || []; }catch(e){}
+  if(!tous.length){ zone.innerHTML=`<div class="vide"><div>💰</div>Aucun paiement enregistré.</div>`; return; }
+  const total = tous.reduce((s,p)=>s+Number(p.montant),0);
+  zone.innerHTML = `
+    <div class="carte"><div class="info-l"><span>Total encaissé (100 derniers)</span><b>${fmtFCFA(total)}</b></div></div>
+    ${tous.map(p=>`
+      <div class="carte">
+        <div class="ligne-carte" onclick="ecranDetailEleve('${p.eleve_id}')">
+          <div>
+            <div class="nom-eleve">${p.eleves? p.eleves.nom+' '+p.eleves.prenom : '—'}</div>
+            <div class="classe-eleve">${fmtDate(p.date)} · ${p.mode||'—'}</div>
+          </div>
+          <b style="color:var(--vert)">${fmtFCFA(p.montant)}</b>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function afficherReglages(){
+  const zone=document.getElementById('zoneContenu');
+  zone.innerHTML = `
+    <div class="carte">
+      <label>Nom de l'école</label>
+      <input id="rNomEcole" value="${CONFIG.nom_ecole||''}">
+      <label>Année scolaire</label>
+      <input id="rAnnee" value="${CONFIG.annee_scolaire||''}">
+      <label>Frais de scolarité annuels (FCFA)</label>
+      <input id="rFrais" type="number" value="${CONFIG.frais_scolarite||0}">
+      <label>Classes (séparées par des virgules)</label>
+      <textarea id="rClasses">${(CONFIG.classes||[]).join(', ')}</textarea>
+      <label>Matières (séparées par des virgules)</label>
+      <textarea id="rMatieres">${(CONFIG.matieres||[]).join(', ')}</textarea>
+      <button class="btn btn-p" onclick="enregistrerReglages()">💾 Enregistrer les réglages</button>
+    </div>
+  `;
+}
+async function enregistrerReglages(){
+  const payload={
+    nom_ecole:document.getElementById('rNomEcole').value.trim(),
+    annee_scolaire:document.getElementById('rAnnee').value.trim(),
+    frais_scolarite:parseFloat(document.getElementById('rFrais').value)||0,
+    classes: document.getElementById('rClasses').value.split(',').map(s=>s.trim()).filter(Boolean),
+    matieres: document.getElementById('rMatieres').value.split(',').map(s=>s.trim()).filter(Boolean),
+  };
+  try{
+    await sb('config?id=eq.principal',{method:'PATCH', body:JSON.stringify(payload)});
+    toast('Réglages enregistrés ✓');
+    CONFIG = {...CONFIG, ...payload};
+    ecranPrincipal();
+  }catch(e){ toast('Erreur : '+e.message); }
+}
+
+(function(){ ecranLogin(); })();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>
